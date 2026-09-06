@@ -1,0 +1,915 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ashour Quiz Platform</title>
+    
+    <!-- PWA Settings -->
+    <meta name="theme-color" content="#090D16">
+    <link rel="manifest" href='data:application/manifest+json,{"name":"Ashour Quiz Platform","short_name":"مسابقات مستر عاشور","start_url":"./index.html","display":"standalone","background_color":"#090D16","theme_color":"#090D16","icons":[{"src":"app-icon.png","sizes":"192x192","type":"image/png"}]}'>   
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body { font-family: 'Cairo', sans-serif; background-color: #090D16; }
+        .glass-panel {
+            background: rgba(15, 23, 42, 0.85);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+        }
+        .glow-purple { box-shadow: 0 0 35px -5px rgba(147, 51, 234, 0.35); }
+        .glow-emerald { box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35); }
+        .glow-amber { box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.35); }
+    </style>
+</head>
+<body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
+
+    <!-- Header -->
+    <header class="glass-panel sticky top-0 z-50 px-8 py-4 flex justify-between items-center border-b border-slate-800">
+        <div class="flex items-center gap-4 cursor-pointer" onclick="goHome()">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-purple-500/30">
+                A
+            </div>
+            <div>
+                <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
+                    ASHOUR QUIZ PLATFORM
+                </h1>
+                <p class="text-[10px] text-slate-400 font-semibold">منصة المسابقات التفاعلية لمستر محمد عاشور</p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-3">
+            <!-- Install PWA Button -->
+            <button id="pwaInstallBtn" class="hidden bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-1.5">
+                <i class="fa-solid fa-download text-xs"></i>
+                <span>تثبيت التطبيق</span>
+            </button>
+
+            <!-- User Profile Badge -->
+            <div id="userBadge" onclick="handleBadgeClick()" class="hidden cursor-pointer flex items-center gap-3 bg-slate-900/90 px-4 py-2 rounded-full border border-purple-500/30 hover:border-purple-400 transition glow-purple">
+                <div id="avatarContainer" class="w-9 h-9 rounded-full border border-purple-400 bg-slate-800 flex items-center justify-center overflow-hidden">
+                    <img id="navAvatar" src="" class="w-full h-full object-cover hidden">
+                    <span id="navAvatarEmoji" class="text-lg"></span>
+                </div>
+                <div class="text-right">
+                    <span id="navUsername" class="block font-bold text-xs text-slate-200"></span>
+                    <span id="navRole" class="block text-[10px] text-purple-400 font-semibold"></span>
+                </div>
+                <i id="editIcon" class="fa-solid fa-pen text-[10px] text-slate-500 mr-1"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow flex items-center justify-center">
+
+        <!-- ROLE SELECTOR -->
+        <section id="screenRoleSelector" class="w-full max-w-md space-y-4">
+            <div class="text-center space-y-2 mb-6">
+                <h2 class="text-2xl font-black text-white">مرحباً بك في المنصة</h2>
+                <p class="text-xs text-slate-400">اختر نوع الحساب للدخول</p>
+            </div>
+
+            <div onclick="selectRole('student')" class="glass-panel p-6 rounded-2xl border border-slate-800 hover:border-emerald-500/50 cursor-pointer transition flex items-center gap-4 group hover:scale-[1.02]">
+                <div class="w-12 h-12 rounded-xl bg-emerald-500/10 text-emerald-400 flex items-center justify-center text-xl font-bold group-hover:bg-emerald-500 group-hover:text-white transition">
+                    <i class="fa-solid fa-user-graduate"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-base">دخول الطالب</h3>
+                    <p class="text-xs text-slate-400">الانضمام المباشر لغرفة المسابقة عبر رمز PIN</p>
+                </div>
+            </div>
+
+            <div onclick="selectRole('teacher')" class="glass-panel p-6 rounded-2xl border border-slate-800 hover:border-purple-500/50 cursor-pointer transition flex items-center gap-4 group hover:scale-[1.02]">
+                <div class="w-12 h-12 rounded-xl bg-purple-500/10 text-purple-400 flex items-center justify-center text-xl font-bold group-hover:bg-purple-600 group-hover:text-white transition">
+                    <i class="fa-solid fa-chalkboard-user"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-white text-base">حساب المستر</h3>
+                    <p class="text-xs text-slate-400">إدارة وإنشاء الغرف المباشرة والأسئلة</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENT JOIN SCREEN -->
+        <section id="screenStudentJoin" class="hidden w-full max-w-md">
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-6 glow-emerald">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-black text-white">دخول المسابقة</h2>
+                    <p class="text-xs text-slate-400">أدخل اسمك ورقم الغرفة المكون من 6 أرقام</p>
+                </div>
+
+                <form onsubmit="handleStudentJoin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">اسم الطالب بالكامل</label>
+                        <input type="text" id="studentName" required placeholder="مثال: المدني محمد" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">رمز الغرفة (Room PIN)</label>
+                        <input type="number" id="roomPinInput" required placeholder="أدخل الرمز الخاص بالغرفة" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-white font-mono text-center tracking-widest text-lg">
+                    </div>
+                    <button type="submit" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-black text-base shadow-lg transition">
+                        دخول الغرفة الآن <i class="fa-solid fa-arrow-left mr-2"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- STUDENT WAITING LOBBY -->
+        <section id="screenStudentWaiting" class="hidden w-full max-w-md text-center space-y-6">
+            <div class="glass-panel p-8 rounded-3xl space-y-6 glow-emerald">
+                <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-500/40 animate-pulse">
+                    <i class="fa-solid fa-hourglass-half"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-white">أهلاً بك، <span id="waitingStudentName" class="text-emerald-400"></span>!</h2>
+                    <p class="text-xs text-slate-400 mt-2">تم دخول الغرفة بنجاح. في انتظار بدء المستر للمسابقة...</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- STUDENT QUIZ ACTIVE -->
+        <section id="screenStudentQuiz" class="hidden w-full max-w-xl space-y-6">
+            <div class="glass-panel p-6 rounded-2xl flex justify-between items-center border-b border-emerald-500/30">
+                <div>
+                    <span class="text-xs text-emerald-400 font-bold">مسابقة حية قائمة</span>
+                    <h3 id="studentQuizTitle" class="text-lg font-black text-white">اسم الاختبار</h3>
+                </div>
+                <div class="bg-slate-900 px-3 py-1.5 rounded-xl border border-slate-800 text-xs font-bold text-slate-300">
+                    السؤال <span id="currentQNum">1</span> من <span id="totalQNum">1</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-8 rounded-3xl space-y-6">
+                <h3 id="displayQuestionText" class="text-xl font-bold text-white leading-relaxed text-center"></h3>
+                <div id="optionsContainer" class="grid grid-cols-1 gap-3 pt-2"></div>
+            </div>
+        </section>
+
+        <!-- STUDENT RESULT SCREEN -->
+        <section id="screenStudentResult" class="hidden w-full max-w-md text-center space-y-6">
+            <div class="glass-panel p-8 rounded-3xl space-y-6 glow-emerald">
+                <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-emerald-500/40">
+                    <i class="fa-solid fa-trophy"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-white">عاش يا بطل!</h2>
+                    <p class="text-xs text-slate-400 mt-1">أتممت حل جميع الأسئلة بنجاح</p>
+                </div>
+                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
+                    <span class="text-xs text-slate-400">درجتك في المسابقة</span>
+                    <span id="finalScoreText" class="block text-3xl font-black text-emerald-400">0 / 0</span>
+                </div>
+                <button onclick="goHome()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold text-sm">
+                    العودة للرئيسية
+                </button>
+            </div>
+        </section>
+
+        <!-- TEACHER AUTH -->
+        <section id="screenTeacherAuth" class="hidden w-full max-w-md">
+            <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-6 glow-purple">
+                <div class="text-center space-y-2">
+                    <h2 class="text-2xl font-black text-white">دخول المستر</h2>
+                    <p class="text-xs text-slate-400">تعيين كلمة السر الخاصة بإنشاء الغرف</p>
+                </div>
+
+                <form onsubmit="handleTeacherLogin(event)" class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">اسم المستر</label>
+                        <input type="text" id="teacherNameInput" required placeholder="م.محمد" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white">
+                    </div>
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">كلمة السر </label>
+                        <input type="password" id="teacherPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white">
+                    </div>
+                    <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-black text-base shadow-lg transition">
+                        دخول وحفظ الحساب <i class="fa-solid fa-lock mr-2"></i>
+                    </button>
+                </form>
+            </div>
+        </section>
+
+        <!-- TEACHER DASHBOARD -->
+        <section id="screenTeacherDashboard" class="hidden w-full space-y-6">
+            <div class="flex justify-between items-center">
+                <div>
+                    <h2 class="text-2xl font-black text-white">إدارة غرف المسابقات</h2>
+                    <p class="text-xs text-slate-400">قم بإنشاء غرف وتعيين الأسئلة والإجابات الصحيحة</p>
+                </div>
+                <button onclick="openCreateRoomScreen()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg flex items-center gap-2">
+                    <i class="fa-solid fa-plus"></i> إنشاء غرفة جديدة
+                </button>
+            </div>
+
+            <div id="roomsContainer" class="grid md:grid-cols-2 gap-4"></div>
+        </section>
+
+        <!-- CREATE ROOM & QUESTIONS -->
+        <section id="screenCreateRoom" class="hidden w-full max-w-2xl">
+            <div class="glass-panel p-8 rounded-3xl space-y-6 glow-purple">
+                <div class="flex justify-between items-center border-b border-slate-800 pb-4">
+                    <h3 class="text-xl font-black text-white">إنشاء غرفة أسئلة جديدة</h3>
+                    <button onclick="showScreen('screenTeacherDashboard')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+                </div>
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-xs font-bold text-slate-300 mb-2">عنوان الغرفة / اسم الاختبار</label>
+                        <input type="text" id="roomTitleInput" placeholder="مثال: اختبار الفيزياء - الفصل الأول" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white">
+                    </div>
+
+                    <div class="bg-slate-900/80 p-5 rounded-2xl border border-slate-800 space-y-4">
+                        <h4 class="text-xs font-bold text-purple-400">إضافة سؤال جديد وتحديد الإجابة الصحيحة:</h4>
+                        <input type="text" id="qTextInput" placeholder="اكتب نص السؤال هنا..." class="w-full bg-slate-800 border border-slate-700 p-3 rounded-xl text-sm text-white">
+                        
+                        <div class="space-y-2">
+                            <label class="block text-[11px] text-slate-400">اكتب الخيارات واضغط على الزر بجانب الخيار الصحيح:</label>
+                            <div id="dynamicOptionsList" class="space-y-2"></div>
+                            <button type="button" onclick="addExtraOptionField()" class="text-xs text-purple-400 hover:text-purple-300 font-bold flex items-center gap-1 pt-1">
+                                <i class="fa-solid fa-circle-plus"></i> إضافة خيار آخر (خامس / سادس)
+                            </button>
+                        </div>
+
+                        <button onclick="addQuestionToTempList()" class="w-full bg-purple-600/30 hover:bg-purple-600 border border-purple-500/50 text-purple-200 hover:text-white py-3 rounded-xl text-xs font-bold transition flex items-center justify-center gap-2">
+                            <i class="fa-solid fa-plus"></i> حفظ هذا السؤال والانتقال للسؤال التالي
+                        </button>
+                    </div>
+
+                    <div>
+                        <span class="text-xs font-bold text-slate-400">الأسئلة المضافة حالياً: (<span id="tempQCount">0</span>)</span>
+                        <ul id="tempQList" class="mt-2 space-y-1 text-xs text-slate-300"></ul>
+                    </div>
+
+                    <button onclick="saveNewRoom()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-3.5 rounded-xl font-black text-sm shadow-lg">
+                        حفظ الغرفة واستخراج الـ PIN <i class="fa-solid fa-check ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- TEACHER LIVE MONITOR -->
+        <section id="screenTeacherMonitor" class="hidden w-full max-w-2xl space-y-6">
+            <div class="glass-panel p-6 rounded-2xl flex justify-between items-center border-b border-purple-500/30">
+                <div>
+                    <span class="text-xs text-purple-400 font-bold">لوحة مراقبة المستر الحية</span>
+                    <h3 id="monitorRoomTitle" class="text-lg font-black text-white">اسم الغرفة</h3>
+                </div>
+                <div class="text-center bg-slate-900 px-4 py-2 rounded-xl border border-slate-800">
+                    <span class="text-[10px] text-slate-400 block">رمز الغرفة</span>
+                    <span id="monitorPin" class="text-xl font-black text-purple-400 font-mono">000000</span>
+                </div>
+            </div>
+
+            <div class="glass-panel p-6 rounded-2xl space-y-4">
+                <div class="flex justify-between items-center">
+                    <span class="text-xs font-bold text-slate-300">الطلاب المنضمون حالياً والتقدم الحقيقي:</span>
+                    <span class="text-xs font-black text-emerald-400"><i class="fa-solid fa-users ml-1"></i> <span id="activeStudentsCount">0</span> طلاب</span>
+                </div>
+
+                <div class="space-y-2" id="monitorStudentsList">
+                    <p id="noStudentsMsg" class="text-xs text-slate-500 text-center py-4">في انتظار انضمام الطلاب عبر رمز الغرفة...</p>
+                </div>
+            </div>
+
+            <div id="teacherActionControls" class="space-y-3">
+                <button id="startQuizBtn" onclick="startQuizByTeacher()" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white py-4 rounded-2xl font-black text-base shadow-lg transition">
+                    بدء المسابقة الآن للجميع <i class="fa-solid fa-play mr-2"></i>
+                </button>
+                <button id="endQuizBtn" onclick="endQuizByTeacher()" class="w-full bg-red-600 hover:bg-red-500 text-white py-4 rounded-2xl font-black text-base shadow-lg transition hidden">
+                    إنهاء المسابقة وإعلان المراكز والأوائل <i class="fa-solid fa-trophy mr-2"></i>
+                </button>
+            </div>
+        </section>
+
+        <!-- LEADERBOARD / RESULTS -->
+        <section id="screenLeaderboard" class="hidden w-full max-w-xl space-y-6">
+            <div class="glass-panel p-8 rounded-3xl text-center space-y-6 glow-amber">
+                <div class="w-20 h-20 bg-amber-500/20 text-amber-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-amber-500/40 animate-bounce">
+                    <i class="fa-solid fa-crown"></i>
+                </div>
+                <div>
+                    <h2 class="text-2xl font-black text-white">لوحة شرف الأوائل والنتائج</h2>
+                    <p class="text-xs text-slate-400 mt-1">ترتيب الطلاب الأكثر إجابات صحيحة وأسرع أداء</p>
+                </div>
+
+                <div id="leaderboardList" class="space-y-3 text-right"></div>
+
+                <button onclick="showScreen('screenTeacherDashboard')" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-black text-sm shadow-lg">
+                    العودة للوحة تحكم الغرف
+                </button>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- PROFILE MODAL -->
+    <div id="profileModal" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm z-50 flex items-center justify-center p-4">
+        <div class="glass-panel p-6 rounded-3xl max-w-sm w-full space-y-5 glow-purple">
+            <div class="flex justify-between items-center border-b border-slate-800 pb-3">
+                <h3 class="font-black text-white text-base">تعديل الملف الشخصي</h3>
+                <button onclick="closeProfileModal()" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            
+            <div class="space-y-4">
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2">الاسم المعلن</label>
+                    <input type="text" id="editNameInput" class="w-full bg-slate-900 border border-slate-700 p-3 rounded-xl text-sm text-white">
+                </div>
+                <div>
+                    <label class="block text-xs font-bold text-slate-300 mb-2">اختر الشخصية تعبيرية:</label>
+                    <div class="grid grid-cols-4 gap-2 pt-1" id="avatarGallery"></div>
+                </div>
+            </div>
+
+            <div class="flex gap-2 pt-2">
+                <button onclick="saveProfile()" class="flex-1 bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-xl font-bold text-xs">حفظ التعديلات</button>
+                <button onclick="closeProfileModal()" class="bg-slate-800 text-slate-300 px-4 py-2.5 rounded-xl font-bold text-xs">إلغاء</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK Modular Scripts -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-app.js";
+        import { getDatabase, ref, set, get, update, remove, onValue, off } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-database.js";
+
+        // إعدادات Firebase الخاصة بالمشروع
+        const firebaseConfig = {
+            apiKey: "AIzaSyAU6o37HsFJOSX8L72e1WgWBhlywnlFDhg",
+            authDomain: "ashour-quiz.firebaseapp.com",
+            projectId: "ashour-quiz",
+            storageBucket: "ashour-quiz.firebasestorage.app",
+            messagingSenderId: "177852023649",
+            appId: "1:177852023649:web:79a9a763044b7c697b7b20",
+            measurementId: "G-MDHH4461DP",
+            databaseURL: "https://ashour-quiz-default-rtdb.firebaseio.com"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+
+        // PWA Installation Logic
+        let deferredPrompt;
+        const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+
+        window.addEventListener('beforeinstallprompt', (e) => {
+            e.preventDefault();
+            deferredPrompt = e;
+            if (pwaInstallBtn) {
+                pwaInstallBtn.classList.remove('hidden');
+            }
+        });
+
+        if (pwaInstallBtn) {
+            pwaInstallBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+                deferredPrompt.prompt();
+                const { outcome } = await deferredPrompt.userChoice;
+                if (outcome === 'accepted') {
+                    pwaInstallBtn.classList.add('hidden');
+                }
+                deferredPrompt = null;
+            });
+        }
+
+        window.addEventListener('appinstalled', () => {
+            if (pwaInstallBtn) {
+                pwaInstallBtn.classList.add('hidden');
+            }
+            deferredPrompt = null;
+        });
+
+        // Register Inline Service Worker
+        if ('serviceWorker' in navigator) {
+            const swCode = `
+                self.addEventListener('install', (e) => self.skipWaiting());
+                self.addEventListener('activate', (e) => self.clients.claim());
+                self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
+            `;
+            const blob = new Blob([swCode], { type: 'application/javascript' });
+            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+        }
+
+        // متغيرات التطبيق
+        let currentRooms = [];
+        let currentStudent = null;
+        let activeQuiz = null;
+        let activeQIndex = 0;
+        let studentScore = 0;
+        let tempQuestions = [];
+        let optionCount = 4;
+        let selectedCorrectIndex = 0;
+        let selectedAvatarEmoji = '🎓';
+        
+        let roomsUnsubscribe = null;
+        let waitingRoomUnsubscribe = null;
+        let liveStudentsUnsubscribe = null;
+
+        const avatarEmojis = ['🎓', '🚀', '👑', '⚡', '🤖', '🎮', '💡', '🔥', '🏆', '🌟', '🎯', '🦁'];
+
+        window.onload = function() {
+            showScreen('screenRoleSelector');
+            renderAvatarOptions();
+            
+            const savedStudentName = localStorage.getItem('ashour_student_saved_name');
+            if (savedStudentName) {
+                document.getElementById('studentName').value = savedStudentName;
+            }
+        };
+
+        window.showScreen = function(screenId) {
+            if(screenId !== 'screenTeacherDashboard' && roomsUnsubscribe) {
+                off(ref(db, 'rooms'), 'value', roomsUnsubscribe);
+                roomsUnsubscribe = null;
+            }
+            if(screenId !== 'screenStudentWaiting' && waitingRoomUnsubscribe) {
+                off(ref(db, `rooms/${currentStudent?.pin}`), 'value', waitingRoomUnsubscribe);
+                waitingRoomUnsubscribe = null;
+            }
+            if(screenId !== 'screenTeacherMonitor' && liveStudentsUnsubscribe) {
+                const currentPin = document.getElementById('monitorPin')?.innerText;
+                if(currentPin) off(ref(db, `students/${currentPin}`), 'value', liveStudentsUnsubscribe);
+                liveStudentsUnsubscribe = null;
+            }
+
+            ['screenRoleSelector', 'screenStudentJoin', 'screenStudentWaiting', 'screenStudentQuiz', 'screenStudentResult', 'screenTeacherAuth', 'screenTeacherDashboard', 'screenCreateRoom', 'screenTeacherMonitor', 'screenLeaderboard'].forEach(id => {
+                document.getElementById(id).classList.add('hidden');
+            });
+            document.getElementById(screenId).classList.remove('hidden');
+        };
+
+        window.goHome = function() {
+            showScreen('screenRoleSelector');
+        };
+
+        window.selectRole = function(role) {
+            if (role === 'student') {
+                const savedName = localStorage.getItem('ashour_student_saved_name');
+                const savedAvatar = localStorage.getItem('ashour_student_saved_avatar') || '🎓';
+                if (savedName) {
+                    setupUserBadge(savedName, 'طالب', savedAvatar, false);
+                }
+                showScreen('screenStudentJoin');
+            } else {
+                const savedTeacher = localStorage.getItem('ashour_teacher');
+                if (savedTeacher) {
+                    setupUserBadge(savedTeacher, 'المستر', 'teacher.png', true);
+                    listenToRooms();
+                    showScreen('screenTeacherDashboard');
+                } else {
+                    showScreen('screenTeacherAuth');
+                }
+            }
+        };
+
+        window.handleStudentJoin = async function(e) {
+            e.preventDefault();
+            const name = document.getElementById('studentName').value.trim();
+            const pin = document.getElementById('roomPinInput').value.trim();
+
+            if(!name || !pin) return;
+
+            localStorage.setItem('ashour_student_saved_name', name);
+
+            const roomRef = ref(db, `rooms/${pin}`);
+            const snapshot = await get(roomRef);
+
+            if (!snapshot.exists()) {
+                alert('رمز الغرفة غير صحيح، تأكد من الرقم من المستر!');
+                return;
+            }
+
+            const foundRoom = snapshot.val();
+
+            if (foundRoom.isFinished) {
+                alert('هذه المسابقة تم إغلاقها وإنهائها بواسطة المستر!');
+                return;
+            }
+
+            const avatarEmoji = localStorage.getItem('ashour_student_saved_avatar') || '🎓';
+            currentStudent = { name, pin, score: 0, progress: 0, completed: false, avatar: avatarEmoji };
+            activeQuiz = foundRoom;
+            activeQIndex = 0;
+            studentScore = 0;
+
+            updateLiveStudentInFirebase();
+            setupUserBadge(name, 'طالب', avatarEmoji, false);
+
+            if (foundRoom.isStarted) {
+                startStudentQuizView();
+            } else {
+                document.getElementById('waitingStudentName').innerText = name;
+                showScreen('screenStudentWaiting');
+                
+                waitingRoomUnsubscribe = onValue(roomRef, (snap) => {
+                    const updatedRoom = snap.val();
+                    if (updatedRoom && updatedRoom.isStarted) {
+                        activeQuiz = updatedRoom;
+                        startStudentQuizView();
+                    }
+                });
+            }
+        };
+
+        function startStudentQuizView() {
+            document.getElementById('studentQuizTitle').innerText = activeQuiz.title;
+            document.getElementById('totalQNum').innerText = activeQuiz.questions.length;
+            showScreen('screenStudentQuiz');
+            loadStudentQuestion();
+        }
+
+        function updateLiveStudentInFirebase() {
+            if(!currentStudent) return;
+            const studentRef = ref(db, `students/${currentStudent.pin}/${currentStudent.name}`);
+            set(studentRef, currentStudent);
+        }
+
+        function loadStudentQuestion() {
+            const q = activeQuiz.questions[activeQIndex];
+            document.getElementById('currentQNum').innerText = activeQIndex + 1;
+            document.getElementById('displayQuestionText').innerText = q.qText;
+
+            const optsDiv = document.getElementById('optionsContainer');
+            optsDiv.innerHTML = '';
+
+            q.opts.forEach((optText) => {
+                const btn = document.createElement('button');
+                btn.className = "w-full bg-slate-900 hover:bg-purple-600/30 border border-slate-800 hover:border-purple-500 p-4 rounded-2xl text-right font-bold text-sm transition";
+                btn.innerText = optText;
+                btn.onclick = () => handleAnswerSelect(optText, q.correctAnswer);
+                optsDiv.appendChild(btn);
+            });
+        }
+
+        function handleAnswerSelect(selected, correct) {
+            if (selected === correct) {
+                studentScore++;
+            }
+
+            activeQIndex++;
+            currentStudent.score = studentScore;
+            currentStudent.progress = Math.round((activeQIndex / activeQuiz.questions.length) * 100);
+
+            if (activeQIndex < activeQuiz.questions.length) {
+                updateLiveStudentInFirebase();
+                loadStudentQuestion();
+            } else {
+                currentStudent.completed = true;
+                updateLiveStudentInFirebase();
+                document.getElementById('finalScoreText').innerText = `${studentScore} / ${activeQuiz.questions.length}`;
+                showScreen('screenStudentResult');
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+            }
+        }
+
+        window.handleTeacherLogin = function(e) {
+            e.preventDefault();
+            const name = document.getElementById('teacherNameInput').value || "مستر محمد عاشور";
+            localStorage.setItem('ashour_teacher', name);
+            setupUserBadge(name, 'المستر', 'teacher.png', true);
+            listenToRooms();
+            showScreen('screenTeacherDashboard');
+        };
+
+        function setupUserBadge(name, role, avatarVal, isTeacher = false) {
+            document.getElementById('navUsername').innerText = name;
+            document.getElementById('navRole').innerText = role;
+
+            const imgEl = document.getElementById('navAvatar');
+            const emojiEl = document.getElementById('navAvatarEmoji');
+            const editIcon = document.getElementById('editIcon');
+
+            if (isTeacher) {
+                imgEl.src = 'teacher.png';
+                imgEl.onerror = function() {
+                    this.classList.add('hidden');
+                    emojiEl.innerText = '👨‍🏫';
+                    emojiEl.classList.remove('hidden');
+                };
+                imgEl.classList.remove('hidden');
+                emojiEl.classList.add('hidden');
+                editIcon.classList.add('hidden');
+            } else {
+                imgEl.classList.add('hidden');
+                emojiEl.innerText = avatarVal || '🎓';
+                emojiEl.classList.remove('hidden');
+                editIcon.classList.remove('hidden');
+            }
+
+            document.getElementById('userBadge').classList.remove('hidden');
+        }
+
+        window.handleBadgeClick = function() {
+            const role = document.getElementById('navRole').innerText;
+            if (role !== 'المستر') {
+                openProfileModal();
+            }
+        };
+
+        window.openCreateRoomScreen = function() {
+            tempQuestions = [];
+            document.getElementById('tempQList').innerHTML = '';
+            document.getElementById('tempQCount').innerText = '0';
+            document.getElementById('roomTitleInput').value = '';
+            resetQuestionForm();
+            showScreen('screenCreateRoom');
+        };
+
+        function resetQuestionForm() {
+            document.getElementById('qTextInput').value = '';
+            optionCount = 4;
+            selectedCorrectIndex = 0;
+            renderDynamicOptions();
+        }
+
+        function renderDynamicOptions() {
+            const container = document.getElementById('dynamicOptionsList');
+            container.innerHTML = '';
+
+            for (let i = 0; i < optionCount; i++) {
+                const isCorrect = (i === selectedCorrectIndex);
+                const row = document.createElement('div');
+                row.className = `flex items-center gap-2 p-1.5 rounded-xl border ${isCorrect ? 'border-emerald-500 bg-emerald-500/10' : 'border-slate-800 bg-slate-800'}`;
+
+                row.innerHTML = `
+                    <button type="button" onclick="setCorrectOption(${i})" class="px-3 py-1.5 rounded-lg text-xs font-bold transition flex items-center gap-1 ${isCorrect ? 'bg-emerald-500 text-white' : 'bg-slate-700 text-slate-300 hover:bg-slate-600'}">
+                        <i class="fa-solid ${isCorrect ? 'fa-circle-check' : 'fa-circle'}"></i>
+                        ${isCorrect ? 'الإجابة الصحيحة' : 'تحديد كصحيح'}
+                    </button>
+                    <input type="text" id="optInput_${i}" placeholder="الخيار ${i + 1}" class="w-full bg-transparent p-2 text-xs text-white focus:outline-none">
+                `;
+                container.appendChild(row);
+            }
+        }
+
+        window.setCorrectOption = function(index) {
+            selectedCorrectIndex = index;
+            renderDynamicOptions();
+        };
+
+        window.addExtraOptionField = function() {
+            if (optionCount < 8) {
+                optionCount++;
+                renderDynamicOptions();
+            } else {
+                alert('الحد الأقصى للخيارات هو 8 خيارات للسؤال الواحد.');
+            }
+        };
+
+        window.addQuestionToTempList = function() {
+            const qText = document.getElementById('qTextInput').value;
+            const collectedOpts = [];
+
+            for (let i = 0; i < optionCount; i++) {
+                const val = document.getElementById(`optInput_${i}`).value.trim();
+                if (val) collectedOpts.push(val);
+            }
+
+            if (!qText || collectedOpts.length < 2) {
+                alert('برجاء كتابة نص السؤال مع إدخال خيارين على الأقل.');
+                return;
+            }
+
+            const correctAnswerText = collectedOpts[selectedCorrectIndex] || collectedOpts[0];
+
+            tempQuestions.push({
+                qText,
+                opts: collectedOpts,
+                correctAnswer: correctAnswerText
+            });
+
+            document.getElementById('tempQCount').innerText = tempQuestions.length;
+            
+            const li = document.createElement('li');
+            li.className = "bg-slate-900 p-2 rounded border border-slate-800 flex justify-between items-center";
+            li.innerHTML = `<span>س ${tempQuestions.length}: ${qText}</span> <span class="text-emerald-400 font-bold text-[10px]">✔ ${correctAnswerText}</span>`;
+            document.getElementById('tempQList').appendChild(li);
+
+            resetQuestionForm();
+        };
+
+        window.saveNewRoom = async function() {
+            const title = document.getElementById('roomTitleInput').value || 'غرفة مسابقة بدون عنوان';
+            if(tempQuestions.length === 0) {
+                alert('برجاء إضافة سؤال واحد على الأقل للغرفة');
+                return;
+            }
+
+            const pin = Math.floor(100000 + Math.random() * 900000);
+            const id = Date.now();
+            const newRoom = { id, title, pin, isFinished: false, isStarted: false, questions: tempQuestions };
+            
+            await set(ref(db, `rooms/${pin}`), newRoom);
+            showScreen('screenTeacherDashboard');
+        };
+
+        function listenToRooms() {
+            const roomsRef = ref(db, 'rooms');
+            roomsUnsubscribe = onValue(roomsRef, (snapshot) => {
+                const data = snapshot.val();
+                currentRooms = data ? Object.values(data) : [];
+                renderRooms();
+            });
+        }
+
+        function renderRooms() {
+            const container = document.getElementById('roomsContainer');
+            container.innerHTML = '';
+            
+            if(currentRooms.length === 0) {
+                container.innerHTML = `<p class="text-slate-500 text-xs col-span-2 text-center py-8">لا يوجد غرف حالياً. قم بإنشاء أول غرفة الآن!</p>`;
+                return;
+            }
+
+            currentRooms.forEach(room => {
+                const actionBtn = room.isFinished 
+                    ? `<button onclick="showRoomResults(${room.pin})" class="w-full bg-amber-600 hover:bg-amber-500 text-white py-2.5 rounded-xl font-bold text-sm">
+                        عرض نتائج المسابقة <i class="fa-solid fa-trophy mr-1"></i>
+                       </button>`
+                    : `<button onclick="openMonitor('${room.title}', ${room.pin})" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-2.5 rounded-xl font-bold text-sm">
+                        فتح لوحة المراقبة والحضور
+                       </button>`;
+
+                const roomHTML = `
+                    <div class="glass-panel p-6 rounded-2xl border border-slate-800 flex flex-col justify-between space-y-4">
+                        <div class="flex justify-between items-start">
+                            <div>
+                                <span class="text-[10px] bg-purple-500/20 text-purple-300 font-bold px-2.5 py-1 rounded-md">${room.questions ? room.questions.length : 0} أسئلة</span>
+                                ${room.isFinished ? '<span class="text-[10px] bg-red-500/20 text-red-400 font-bold px-2 py-1 rounded-md mr-1">منتهية</span>' : ''}
+                                <h3 class="text-lg font-bold text-white mt-2">${room.title}</h3>
+                                <p class="text-xs text-slate-400 mt-1">رمز PIN: <span class="text-purple-400 font-mono font-bold">${room.pin}</span></p>
+                            </div>
+                            <button onclick="deleteRoom(${room.pin})" class="text-slate-500 hover:text-red-400 p-2 transition" title="حذف الغرفة">
+                                <i class="fa-solid fa-trash-can"></i>
+                            </button>
+                        </div>
+                        ${actionBtn}
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', roomHTML);
+            });
+        }
+
+        window.deleteRoom = async function(pin) {
+            await remove(ref(db, `rooms/${pin}`));
+            await remove(ref(db, `students/${pin}`));
+        };
+
+        window.openMonitor = function(title, pin) {
+            const room = currentRooms.find(r => r.pin === pin);
+            document.getElementById('monitorRoomTitle').innerText = title;
+            document.getElementById('monitorPin').innerText = pin;
+            
+            const startBtn = document.getElementById('startQuizBtn');
+            const endBtn = document.getElementById('endQuizBtn');
+
+            if(room && room.isStarted) {
+                startBtn.classList.add('hidden');
+                endBtn.classList.remove('hidden');
+            } else {
+                startBtn.classList.remove('hidden');
+                endBtn.classList.add('hidden');
+            }
+
+            showScreen('screenTeacherMonitor');
+            
+            const studentsRef = ref(db, `students/${pin}`);
+            liveStudentsUnsubscribe = onValue(studentsRef, (snapshot) => {
+                const data = snapshot.val();
+                const roomStudents = data ? Object.values(data) : [];
+                refreshLiveStudents(roomStudents);
+            });
+        };
+
+        window.startQuizByTeacher = async function() {
+            const pin = parseInt(document.getElementById('monitorPin').innerText);
+            await update(ref(db, `rooms/${pin}`), { isStarted: true });
+            document.getElementById('startQuizBtn').classList.add('hidden');
+            document.getElementById('endQuizBtn').classList.remove('hidden');
+        };
+
+        function refreshLiveStudents(roomStudents) {
+            document.getElementById('activeStudentsCount').innerText = roomStudents.length;
+            const container = document.getElementById('monitorStudentsList');
+            container.innerHTML = '';
+
+            if(roomStudents.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-4">في انتظار انضمام الطلاب عبر رمز الغرفة...</p>`;
+                return;
+            }
+
+            roomStudents.forEach(s => {
+                const statusBadge = s.completed 
+                    ? `<span class="text-[10px] bg-emerald-500/20 text-emerald-400 px-2.5 py-1 rounded-md font-bold">أتم الحل (${s.score} نقاط)</span>`
+                    : `<span class="text-[10px] bg-amber-500/20 text-amber-400 px-2.5 py-1 rounded-md font-bold">يحضر ويحل (${s.progress}%)</span>`;
+
+                const html = `
+                    <div class="bg-slate-900/80 p-3.5 rounded-xl flex justify-between items-center border border-slate-800">
+                        <div class="flex items-center gap-3">
+                            <div class="w-8 h-8 rounded-full bg-slate-800 border border-purple-500/30 flex items-center justify-center text-base">
+                                ${s.avatar || '🎓'}
+                            </div>
+                            <span class="text-xs font-bold text-slate-200">${s.name}</span>
+                        </div>
+                        ${statusBadge}
+                    </div>
+                `;
+                container.insertAdjacentHTML('beforeend', html);
+            });
+        }
+
+        window.endQuizByTeacher = async function() {
+            const currentPin = parseInt(document.getElementById('monitorPin').innerText);
+            await update(ref(db, `rooms/${currentPin}`), { isFinished: true });
+            showRoomResults(currentPin);
+        };
+
+        window.showRoomResults = async function(pin) {
+            const snapshot = await get(ref(db, `students/${pin}`));
+            const data = snapshot.val();
+            const roomStudents = data ? Object.values(data) : [];
+
+            if(roomStudents.length === 0) {
+                alert("لم يسجل أي طلاب في هذه الغرفة!");
+                return;
+            }
+
+            roomStudents.sort((a, b) => b.score - a.score);
+
+            const leaderboardContainer = document.getElementById('leaderboardList');
+            leaderboardContainer.innerHTML = '';
+
+            roomStudents.forEach((s, idx) => {
+                let badge = '';
+                if(idx === 0) badge = '🥇 المركز الأول';
+                else if(idx === 1) badge = '🥈 المركز الثاني';
+                else if(idx === 2) badge = '🥉 المركز الثالث';
+                else badge = `المركز ${idx + 1}`;
+
+                const card = `
+                    <div class="bg-slate-900 p-4 rounded-2xl border ${idx === 0 ? 'border-amber-500/50 glow-amber' : 'border-slate-800'} flex justify-between items-center">
+                        <div class="flex items-center gap-3">
+                            <span class="font-black text-sm text-amber-400 w-6">${idx + 1}#</span>
+                            <div class="w-8 h-8 rounded-full bg-slate-800 border border-amber-500/30 flex items-center justify-center text-base">
+                                ${s.avatar || '🎓'}
+                            </div>
+                            <div>
+                                <span class="block font-bold text-xs text-white">${s.name}</span>
+                                <span class="text-[10px] text-slate-400">${badge}</span>
+                            </div>
+                        </div>
+                        <span class="font-black text-base text-emerald-400">${s.score} نقاط</span>
+                    </div>
+                `;
+                leaderboardContainer.insertAdjacentHTML('beforeend', card);
+            });
+
+            showScreen('screenLeaderboard');
+            confetti({ particleCount: 150, spread: 90, origin: { y: 0.5 } });
+        };
+
+        function renderAvatarOptions() {
+            const gallery = document.getElementById('avatarGallery');
+            gallery.innerHTML = '';
+            avatarEmojis.forEach(emoji => {
+                const div = document.createElement('div');
+                div.innerText = emoji;
+                div.className = "w-11 h-11 rounded-xl bg-slate-900 border-2 border-slate-700 cursor-pointer hover:border-purple-500 flex items-center justify-center text-xl transition";
+                div.onclick = () => {
+                    selectedAvatarEmoji = emoji;
+                    document.querySelectorAll('#avatarGallery div').forEach(i => i.classList.remove('border-purple-500'));
+                    div.classList.add('border-purple-500');
+                };
+                gallery.appendChild(div);
+            });
+        }
+
+        window.openProfileModal = function() {
+            document.getElementById('editNameInput').value = document.getElementById('navUsername').innerText;
+            document.getElementById('profileModal').classList.remove('hidden');
+        };
+
+        window.closeProfileModal = function() {
+            document.getElementById('profileModal').classList.add('hidden');
+        };
+
+        window.saveProfile = function() {
+            const newName = document.getElementById('editNameInput').value;
+
+            if (newName) {
+                localStorage.setItem('ashour_student_saved_name', newName);
+                document.getElementById('navUsername').innerText = newName;
+            }
+            
+            localStorage.setItem('ashour_student_saved_avatar', selectedAvatarEmoji);
+            document.getElementById('navAvatarEmoji').innerText = selectedAvatarEmoji;
+
+            closeProfileModal();
+        };
+    </script>
+</body>
+</html>

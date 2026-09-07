@@ -7,7 +7,8 @@
     
     <!-- PWA Settings -->
     <meta name="theme-color" content="#090D16">
-    <link rel="manifest" href='data:application/manifest+json,{"name":"Ashour Quiz Platform","short_name":"مسابقات مستر عاشور","start_url":"./index.html","display":"standalone","background_color":"#090D16","theme_color":"#090D16","icons":[{"src":"app-icon.png","sizes":"192x192","type":"image/png"}]}'>   
+    <link rel="manifest" href="manifest.json">
+    <link rel="apple-touch-icon" href="app-icon.png">
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
@@ -23,6 +24,8 @@
         .glow-purple { box-shadow: 0 0 35px -5px rgba(147, 51, 234, 0.35); }
         .glow-emerald { box-shadow: 0 0 35px -5px rgba(16, 185, 129, 0.35); }
         .glow-amber { box-shadow: 0 0 35px -5px rgba(245, 158, 11, 0.35); }
+        .answer-correct { background-color: rgba(16, 185, 129, 0.25) !important; border-color: rgb(16, 185, 129) !important; color: #ecfdf5 !important; }
+        .answer-wrong { background-color: rgba(239, 68, 68, 0.25) !important; border-color: rgb(239, 68, 68) !important; color: #fef2f2 !important; }
     </style>
 </head>
 <body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
@@ -43,7 +46,7 @@
 
         <div class="flex items-center gap-3">
             <!-- Install PWA Button -->
-            <button id="pwaInstallBtn" class="hidden bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-1.5">
+            <button id="pwaInstallBtn" title="تثبيت المنصة كاختصار على الجهاز" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-1.5">
                 <i class="fa-solid fa-download text-xs"></i>
                 <span>تثبيت التطبيق</span>
             </button>
@@ -149,21 +152,21 @@
             </div>
         </section>
 
-        <!-- STUDENT RESULT SCREEN -->
+        <!-- STUDENT WAITING FOR FINAL RESULT -->
         <section id="screenStudentResult" class="hidden w-full max-w-md text-center space-y-6">
             <div class="glass-panel p-8 rounded-3xl space-y-6 glow-emerald">
-                <div class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-emerald-500/40">
-                    <i class="fa-solid fa-trophy"></i>
+                <div id="studentResultIcon" class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-emerald-500/40 animate-pulse">
+                    <i class="fa-solid fa-hourglass-half"></i>
                 </div>
                 <div>
-                    <h2 class="text-2xl font-black text-white">عاش يا بطل!</h2>
-                    <p class="text-xs text-slate-400 mt-1">أتممت حل جميع الأسئلة بنجاح</p>
+                    <h2 id="studentResultTitle" class="text-2xl font-black text-white">تم الانتهاء من الإجابة</h2>
+                    <p id="studentResultMessage" class="text-sm text-slate-300 mt-2 leading-relaxed">انتظر حتى يتم المستر إنهاء المسابقة وإعلان مركزك.</p>
                 </div>
-                <div class="bg-slate-900 p-4 rounded-2xl border border-slate-800 space-y-1">
-                    <span class="text-xs text-slate-400">درجتك في المسابقة</span>
-                    <span id="finalScoreText" class="block text-3xl font-black text-emerald-400">0 / 0</span>
+                <div id="studentRankBox" class="hidden bg-slate-900 p-5 rounded-2xl border border-amber-500/30 space-y-2">
+                    <span class="text-xs text-slate-400">مركزك في المسابقة</span>
+                    <span id="studentRankText" class="block text-2xl font-black text-amber-400"></span>
                 </div>
-                <button onclick="goHome()" class="w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold text-sm">
+                <button id="studentReturnHomeBtn" onclick="goHome()" class="hidden w-full bg-slate-800 hover:bg-slate-700 text-slate-200 py-3 rounded-xl font-bold text-sm">
                     العودة للرئيسية
                 </button>
             </div>
@@ -174,20 +177,20 @@
             <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-6 glow-purple">
                 <div class="text-center space-y-2">
                     <h2 class="text-2xl font-black text-white">دخول المستر</h2>
-                    <p class="text-xs text-slate-400">تعيين كلمة السر الخاصة بإنشاء الغرف</p>
+                    <p class="text-xs text-slate-400">أدخل البريد الإلكتروني وكلمة السر الخاصة بالمستر</p>
                 </div>
 
                 <form onsubmit="handleTeacherLogin(event)" class="space-y-4">
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-2">اسم المستر</label>
-                        <input type="text" id="teacherNameInput" required placeholder="م.محمد" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white">
+                        <label class="block text-xs font-bold text-slate-300 mb-2">البريد الإلكتروني</label>
+                        <input type="email" id="teacherEmailInput" required placeholder="teacher@example.com" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white" dir="ltr">
                     </div>
                     <div>
-                        <label class="block text-xs font-bold text-slate-300 mb-2">كلمة السر </label>
-                        <input type="password" id="teacherPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white">
+                        <label class="block text-xs font-bold text-slate-300 mb-2">كلمة السر الخاصة بالمستر</label>
+                        <input type="password" id="teacherPass" required placeholder="••••••••" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-purple-500 text-sm text-white" dir="ltr">
                     </div>
                     <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white py-3.5 rounded-xl font-black text-base shadow-lg transition">
-                        دخول وحفظ الحساب <i class="fa-solid fa-lock mr-2"></i>
+                        دخول المستر <i class="fa-solid fa-lock mr-2"></i>
                     </button>
                 </form>
             </div>
@@ -359,39 +362,38 @@
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
-            if (pwaInstallBtn) {
-                pwaInstallBtn.classList.remove('hidden');
-            }
         });
 
         if (pwaInstallBtn) {
             pwaInstallBtn.addEventListener('click', async () => {
-                if (!deferredPrompt) return;
-                deferredPrompt.prompt();
-                const { outcome } = await deferredPrompt.userChoice;
-                if (outcome === 'accepted') {
-                    pwaInstallBtn.classList.add('hidden');
+                if (deferredPrompt) {
+                    deferredPrompt.prompt();
+                    const { outcome } = await deferredPrompt.userChoice;
+                    if (outcome === 'accepted') pwaInstallBtn.classList.add('hidden');
+                    deferredPrompt = null;
+                    return;
                 }
-                deferredPrompt = null;
+
+                // الزر يظل ظاهراً دائماً، وإذا لم يسمح المتصفح بالنافذة الأصلية نعرض طريقة التثبيت المناسبة.
+                const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+                if (isIOS) {
+                    alert('لتثبيت المنصة على الآيفون أو الآيباد: اضغط مشاركة ثم "إضافة إلى الشاشة الرئيسية".');
+                } else {
+                    alert('إذا لم تظهر نافذة التثبيت، افتح قائمة المتصفح (⋮) ثم اختر "تثبيت التطبيق" أو "إضافة إلى الشاشة الرئيسية".');
+                }
             });
         }
 
         window.addEventListener('appinstalled', () => {
-            if (pwaInstallBtn) {
-                pwaInstallBtn.classList.add('hidden');
-            }
+            if (pwaInstallBtn) pwaInstallBtn.classList.add('hidden');
             deferredPrompt = null;
         });
 
-        // Register Inline Service Worker
+        // Register Service Worker
         if ('serviceWorker' in navigator) {
-            const swCode = `
-                self.addEventListener('install', (e) => self.skipWaiting());
-                self.addEventListener('activate', (e) => self.clients.claim());
-                self.addEventListener('fetch', (e) => e.respondWith(fetch(e.request)));
-            `;
-            const blob = new Blob([swCode], { type: 'application/javascript' });
-            navigator.serviceWorker.register(URL.createObjectURL(blob)).catch(() => {});
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('./sw.js').catch(() => {});
+            });
         }
 
         // متغيرات التطبيق
@@ -404,9 +406,10 @@
         let optionCount = 4;
         let selectedCorrectIndex = 0;
         let selectedAvatarEmoji = '🎓';
+        let isAnswerLocked = false;
         
         let roomsUnsubscribe = null;
-        let waitingRoomUnsubscribe = null;
+        let studentRoomUnsubscribe = null;
         let liveStudentsUnsubscribe = null;
 
         const avatarEmojis = ['🎓', '🚀', '👑', '⚡', '🤖', '🎮', '💡', '🔥', '🏆', '🌟', '🎯', '🦁'];
@@ -426,10 +429,6 @@
                 off(ref(db, 'rooms'), 'value', roomsUnsubscribe);
                 roomsUnsubscribe = null;
             }
-            if(screenId !== 'screenStudentWaiting' && waitingRoomUnsubscribe) {
-                off(ref(db, `rooms/${currentStudent?.pin}`), 'value', waitingRoomUnsubscribe);
-                waitingRoomUnsubscribe = null;
-            }
             if(screenId !== 'screenTeacherMonitor' && liveStudentsUnsubscribe) {
                 const currentPin = document.getElementById('monitorPin')?.innerText;
                 if(currentPin) off(ref(db, `students/${currentPin}`), 'value', liveStudentsUnsubscribe);
@@ -443,6 +442,12 @@
         };
 
         window.goHome = function() {
+            if (studentRoomUnsubscribe && currentStudent?.pin) {
+                off(ref(db, `rooms/${currentStudent.pin}`), 'value', studentRoomUnsubscribe);
+                studentRoomUnsubscribe = null;
+            }
+            currentStudent = null;
+            activeQuiz = null;
             showScreen('screenRoleSelector');
         };
 
@@ -499,19 +504,33 @@
             updateLiveStudentInFirebase();
             setupUserBadge(name, 'طالب', avatarEmoji, false);
 
+            document.getElementById('waitingStudentName').innerText = name;
+
+            if (studentRoomUnsubscribe) {
+                off(roomRef, 'value', studentRoomUnsubscribe);
+                studentRoomUnsubscribe = null;
+            }
+
+            studentRoomUnsubscribe = onValue(roomRef, (snap) => {
+                const updatedRoom = snap.val();
+                if (!updatedRoom || !currentStudent) return;
+                activeQuiz = updatedRoom;
+
+                if (updatedRoom.isFinished) {
+                    showStudentFinalResult();
+                    return;
+                }
+
+                if (updatedRoom.isStarted && !currentStudent.completed) {
+                    const currentScreenIsQuiz = !document.getElementById('screenStudentQuiz').classList.contains('hidden');
+                    if (!currentScreenIsQuiz) startStudentQuizView();
+                }
+            });
+
             if (foundRoom.isStarted) {
                 startStudentQuizView();
             } else {
-                document.getElementById('waitingStudentName').innerText = name;
                 showScreen('screenStudentWaiting');
-                
-                waitingRoomUnsubscribe = onValue(roomRef, (snap) => {
-                    const updatedRoom = snap.val();
-                    if (updatedRoom && updatedRoom.isStarted) {
-                        activeQuiz = updatedRoom;
-                        startStudentQuizView();
-                    }
-                });
             }
         };
 
@@ -530,6 +549,7 @@
 
         function loadStudentQuestion() {
             const q = activeQuiz.questions[activeQIndex];
+            isAnswerLocked = false;
             document.getElementById('currentQNum').innerText = activeQIndex + 1;
             document.getElementById('displayQuestionText').innerText = q.qText;
 
@@ -540,37 +560,99 @@
                 const btn = document.createElement('button');
                 btn.className = "w-full bg-slate-900 hover:bg-purple-600/30 border border-slate-800 hover:border-purple-500 p-4 rounded-2xl text-right font-bold text-sm transition";
                 btn.innerText = optText;
-                btn.onclick = () => handleAnswerSelect(optText, q.correctAnswer);
+                btn.onclick = () => handleAnswerSelect(optText, q.correctAnswer, btn);
                 optsDiv.appendChild(btn);
             });
         }
 
-        function handleAnswerSelect(selected, correct) {
-            if (selected === correct) {
+        function handleAnswerSelect(selected, correct, selectedButton) {
+            if (isAnswerLocked) return;
+            isAnswerLocked = true;
+
+            const allButtons = document.querySelectorAll('#optionsContainer button');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-purple-600/30', 'hover:border-purple-500');
+                btn.classList.add('opacity-70', 'cursor-not-allowed');
+            });
+
+            const isCorrect = selected === correct;
+
+            if (isCorrect) {
                 studentScore++;
-            }
-
-            activeQIndex++;
-            currentStudent.score = studentScore;
-            currentStudent.progress = Math.round((activeQIndex / activeQuiz.questions.length) * 100);
-
-            if (activeQIndex < activeQuiz.questions.length) {
-                updateLiveStudentInFirebase();
-                loadStudentQuestion();
+                selectedButton.classList.remove('opacity-70');
+                selectedButton.classList.add('answer-correct');
             } else {
-                currentStudent.completed = true;
-                updateLiveStudentInFirebase();
-                document.getElementById('finalScoreText').innerText = `${studentScore} / ${activeQuiz.questions.length}`;
-                showScreen('screenStudentResult');
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                selectedButton.classList.remove('opacity-70');
+                selectedButton.classList.add('answer-wrong');
             }
+
+            // انتظار ثانيتين لإظهار نتيجة الإجابة قبل الانتقال للسؤال التالي
+            setTimeout(() => {
+                activeQIndex++;
+                currentStudent.score = studentScore;
+                currentStudent.progress = Math.round((activeQIndex / activeQuiz.questions.length) * 100);
+
+                if (activeQIndex < activeQuiz.questions.length) {
+                    updateLiveStudentInFirebase();
+                    loadStudentQuestion();
+                } else {
+                    currentStudent.completed = true;
+                    currentStudent.progress = 100;
+                    updateLiveStudentInFirebase();
+                    showStudentWaitingForTeacher();
+                }
+            }, 2000);
         }
+
+        function showStudentWaitingForTeacher() {
+            document.getElementById('studentResultTitle').innerText = 'تم الانتهاء من الإجابة';
+            document.getElementById('studentResultMessage').innerText = 'انتظر حتى يتم المستر إنهاء المسابقة وإعلان مركزك.';
+            document.getElementById('studentRankBox').classList.add('hidden');
+            document.getElementById('studentReturnHomeBtn').classList.add('hidden');
+            document.getElementById('studentResultIcon').innerHTML = '<i class="fa-solid fa-hourglass-half"></i>';
+            document.getElementById('studentResultIcon').classList.add('animate-pulse');
+            showScreen('screenStudentResult');
+        }
+
+        async function showStudentFinalResult() {
+            if (!currentStudent) return;
+            const snap = await get(ref(db, `students/${currentStudent.pin}/${currentStudent.name}`));
+            const studentData = snap.exists() ? snap.val() : currentStudent;
+            const rank = studentData.rank || '—';
+            const rankText = studentData.rankText || (rank === 1 ? '🥇 المركز الأول' : rank === 2 ? '🥈 المركز الثاني' : rank === 3 ? '🥉 المركز الثالث' : `المركز ${rank}`);
+
+            document.getElementById('studentResultTitle').innerText = 'تم إعلان النتائج!';
+            document.getElementById('studentResultMessage').innerText = 'أعلن المستر نتيجة المسابقة، وهذا هو مركزك النهائي.';
+            document.getElementById('studentRankText').innerText = rankText;
+            document.getElementById('studentRankBox').classList.remove('hidden');
+            document.getElementById('studentReturnHomeBtn').classList.remove('hidden');
+            document.getElementById('studentResultIcon').innerHTML = '<i class="fa-solid fa-trophy"></i>';
+            document.getElementById('studentResultIcon').classList.remove('animate-pulse');
+            showScreen('screenStudentResult');
+            confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+        }
+
+        // كلمة السر الخاصة بالمستر: غيّرها هنا قبل رفع الموقع.
+        // ملاحظة: هذه حماية واجهة فقط، والأمان الحقيقي على GitHub يحتاج Firebase Authentication.
+        const TEACHER_PASSWORD = 'Ashour2026';
 
         window.handleTeacherLogin = function(e) {
             e.preventDefault();
-            const name = document.getElementById('teacherNameInput').value || "مستر محمد عاشور";
-            localStorage.setItem('ashour_teacher', name);
-            setupUserBadge(name, 'المستر', 'teacher.png', true);
+            const email = document.getElementById('teacherEmailInput').value.trim();
+            const password = document.getElementById('teacherPass').value;
+
+            if (!email || !email.includes('@')) {
+                alert('من فضلك أدخل بريدًا إلكترونيًا صحيحًا.');
+                return;
+            }
+            if (password !== TEACHER_PASSWORD) {
+                alert('كلمة السر غير صحيحة. الدخول للمستر فقط.');
+                return;
+            }
+
+            localStorage.setItem('ashour_teacher', email);
+            setupUserBadge(email, 'المستر', 'teacher.png', true);
             listenToRooms();
             showScreen('screenTeacherDashboard');
         };
@@ -824,7 +906,22 @@
 
         window.endQuizByTeacher = async function() {
             const currentPin = parseInt(document.getElementById('monitorPin').innerText);
-            await update(ref(db, `rooms/${currentPin}`), { isFinished: true });
+            const studentsRef = ref(db, `students/${currentPin}`);
+            const snapshot = await get(studentsRef);
+            const studentsData = snapshot.val() || {};
+            const entries = Object.entries(studentsData).sort(([, a], [, b]) => (b.score || 0) - (a.score || 0));
+
+            const rankUpdates = {};
+            entries.forEach(([key, student], idx) => {
+                const rank = idx + 1;
+                const rankText = rank === 1 ? '🥇 المركز الأول' : rank === 2 ? '🥈 المركز الثاني' : rank === 3 ? '🥉 المركز الثالث' : `المركز ${rank}`;
+                rankUpdates[`${key}/rank`] = rank;
+                rankUpdates[`${key}/rankText`] = rankText;
+            });
+
+            if (Object.keys(rankUpdates).length) await update(studentsRef, rankUpdates);
+            // نحفظ المراكز أولاً ثم ننهي المسابقة حتى لا يعود الطالب إلى الأسئلة.
+            await update(ref(db, `rooms/${currentPin}`), { isFinished: true, isStarted: false });
             showRoomResults(currentPin);
         };
 
@@ -838,7 +935,7 @@
                 return;
             }
 
-            roomStudents.sort((a, b) => b.score - a.score);
+            roomStudents.sort((a, b) => (a.rank || 9999) - (b.rank || 9999) || (b.score - a.score));
 
             const leaderboardContainer = document.getElementById('leaderboardList');
             leaderboardContainer.innerHTML = '';

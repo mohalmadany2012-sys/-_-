@@ -1,6 +1,6 @@
 {
-  "name": "Ashour Quiz Platform",
-  "short_name": "مسابقات عاشور",
+  "name": "منصة الأستاذ محمد عاشور",
+  "short_name": "مستر محمد عاشور",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
@@ -9,7 +9,17 @@
   "dir": "rtl",
   "lang": "ar",
   "icons": [
-    {"src":"app-icon.png","sizes":"192x192","type":"image/png","purpose":"any"},
-    {"src":"app-icon.png","sizes":"512x512","type":"image/png","purpose":"any"}
+    {
+      "src": "app-icon.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
   ]
 }

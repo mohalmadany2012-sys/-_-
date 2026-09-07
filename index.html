@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ashour Quiz Platform</title>
+    <title>منصة الأستاذ محمد عاشور</title>
     
     <!-- PWA Settings -->
     <meta name="theme-color" content="#090D16">
@@ -38,7 +38,7 @@
             </div>
             <div>
                 <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
-                    ASHOUR QUIZ PLATFORM
+                    منصة الأستاذ محمد عاشور
                 </h1>
                 <p class="text-[10px] text-slate-400 font-semibold">منصة المسابقات التفاعلية لمستر محمد عاشور</p>
             </div>
@@ -108,7 +108,7 @@
                 <form onsubmit="handleStudentJoin(event)" class="space-y-4">
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-2">اسم الطالب بالكامل</label>
-                        <input type="text" id="studentName" required placeholder="مثال: محمد المدني" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-white">
+                        <input type="text" id="studentName" required placeholder="مثال: أحمد محمد" class="w-full bg-slate-900 border border-slate-700 p-3.5 rounded-xl focus:outline-none focus:border-emerald-500 text-sm text-white">
                     </div>
                     <div>
                         <label class="block text-xs font-bold text-slate-300 mb-2">رمز الغرفة (Room PIN)</label>
@@ -355,13 +355,19 @@
         const app = initializeApp(firebaseConfig);
         const db = getDatabase(app);
 
-        // PWA Installation Logic
+        // PWA Installation & Auto-Hide Logic
         let deferredPrompt;
         const pwaInstallBtn = document.getElementById('pwaInstallBtn');
+
+        // التحقق مما إذا كان التطبيق مثبت بالفعل ومشغل كـ App
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            if (pwaInstallBtn) pwaInstallBtn.classList.add('hidden');
+        }
 
         window.addEventListener('beforeinstallprompt', (e) => {
             e.preventDefault();
             deferredPrompt = e;
+            if (pwaInstallBtn) pwaInstallBtn.classList.remove('hidden');
         });
 
         if (pwaInstallBtn) {
@@ -369,12 +375,13 @@
                 if (deferredPrompt) {
                     deferredPrompt.prompt();
                     const { outcome } = await deferredPrompt.userChoice;
-                    if (outcome === 'accepted') pwaInstallBtn.classList.add('hidden');
+                    if (outcome === 'accepted') {
+                        pwaInstallBtn.classList.add('hidden');
+                    }
                     deferredPrompt = null;
                     return;
                 }
 
-                // الزر يظل ظاهراً دائماً، وإذا لم يسمح المتصفح بالنافذة الأصلية نعرض طريقة التثبيت المناسبة.
                 const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
                 if (isIOS) {
                     alert('لتثبيت المنصة على الآيفون أو الآيباد: اضغط مشاركة ثم "إضافة إلى الشاشة الرئيسية".');
@@ -587,7 +594,6 @@
                 selectedButton.classList.add('answer-wrong');
             }
 
-            // انتظار ثانيتين لإظهار نتيجة الإجابة قبل الانتقال للسؤال التالي
             setTimeout(() => {
                 activeQIndex++;
                 currentStudent.score = studentScore;
@@ -633,8 +639,6 @@
             confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
         }
 
-        // كلمة السر الخاصة بالمستر: غيّرها هنا قبل رفع الموقع.
-        // ملاحظة: هذه حماية واجهة فقط، والأمان الحقيقي على GitHub يحتاج Firebase Authentication.
         const TEACHER_PASSWORD = 'Ashour2026';
 
         window.handleTeacherLogin = function(e) {
@@ -920,7 +924,6 @@
             });
 
             if (Object.keys(rankUpdates).length) await update(studentsRef, rankUpdates);
-            // نحفظ المراكز أولاً ثم ننهي المسابقة حتى لا يعود الطالب إلى الأسئلة.
             await update(ref(db, `rooms/${currentPin}`), { isFinished: true, isStarted: false });
             showRoomResults(currentPin);
         };

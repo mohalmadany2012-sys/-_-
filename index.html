@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>منصة الأستاذ محمد عاشور</title>
+    <title>مسابقات مستر محمد عاشور</title>
     
     <!-- PWA Settings -->
     <meta name="theme-color" content="#090D16">
@@ -31,34 +31,32 @@
 <body class="text-slate-100 min-h-screen flex flex-col justify-between selection:bg-purple-500 selection:text-white">
 
     <!-- Header -->
-    <header class="glass-panel sticky top-0 z-50 px-8 py-4 flex justify-between items-center border-b border-slate-800">
-        <div class="flex items-center gap-4 cursor-pointer" onclick="goHome()">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-purple-600 to-indigo-500 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-purple-500/30">
-                A
-            </div>
+    <header class="glass-panel sticky top-0 z-50 px-4 sm:px-8 py-3 flex flex-wrap sm:flex-nowrap justify-between items-center gap-2 border-b border-slate-800">
+        <div class="flex items-center gap-3 cursor-pointer" onclick="goHome()">
+            <img src="app-icon.png" alt="شعار المنصة" class="w-9 h-9 sm:w-10 sm:h-10 rounded-xl object-cover shadow-lg shadow-purple-500/30 border border-purple-500/30">
             <div>
-                <h1 class="text-lg font-black tracking-wide bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
-                    منصة الأستاذ محمد عاشور
+                <h1 class="text-base sm:text-lg font-black tracking-wide bg-gradient-to-r from-purple-400 to-indigo-300 bg-clip-text text-transparent">
+                    مسابقات مستر محمد عاشور
                 </h1>
-                <p class="text-[10px] text-slate-400 font-semibold">منصة المسابقات التفاعلية لمستر محمد عاشور</p>
+                <p class="text-[9px] sm:text-[10px] text-slate-400 font-semibold">مسابقات مستر محمد عاشور</p>
             </div>
         </div>
 
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
             <!-- Install PWA Button -->
-            <button id="pwaInstallBtn" title="تثبيت المنصة كاختصار على الجهاز" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3.5 py-1.5 rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-1.5">
+            <button id="pwaInstallBtn" title="تثبيت المنصة كاختصار على الجهاز" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white px-3 py-1.5 rounded-xl font-bold text-xs shadow-lg transition flex items-center gap-1.5">
                 <i class="fa-solid fa-download text-xs"></i>
                 <span>تثبيت التطبيق</span>
             </button>
 
             <!-- User Profile Badge -->
-            <div id="userBadge" onclick="handleBadgeClick()" class="hidden cursor-pointer flex items-center gap-3 bg-slate-900/90 px-4 py-2 rounded-full border border-purple-500/30 hover:border-purple-400 transition glow-purple">
-                <div id="avatarContainer" class="w-9 h-9 rounded-full border border-purple-400 bg-slate-800 flex items-center justify-center overflow-hidden">
+            <div id="userBadge" onclick="handleBadgeClick()" class="hidden cursor-pointer flex items-center gap-2.5 bg-slate-900/90 px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-purple-500/30 hover:border-purple-400 transition glow-purple">
+                <div id="avatarContainer" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-purple-400 bg-slate-800 flex items-center justify-center overflow-hidden">
                     <img id="navAvatar" src="" class="w-full h-full object-cover hidden">
-                    <span id="navAvatarEmoji" class="text-lg"></span>
+                    <span id="navAvatarEmoji" class="text-base sm:text-lg"></span>
                 </div>
                 <div class="text-right">
-                    <span id="navUsername" class="block font-bold text-xs text-slate-200"></span>
+                    <span id="navUsername" class="block font-bold text-xs text-slate-200">مستر محمد عاشور</span>
                     <span id="navRole" class="block text-[10px] text-purple-400 font-semibold"></span>
                 </div>
                 <i id="editIcon" class="fa-solid fa-pen text-[10px] text-slate-500 mr-1"></i>
@@ -66,11 +64,17 @@
         </div>
     </header>
 
+    <!-- Toast Notification for Copy -->
+    <div id="copyToast" class="fixed bottom-5 left-1/2 -translate-x-1/2 z-50 bg-emerald-600 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-lg transition-all opacity-0 pointer-events-none flex items-center gap-2">
+        <i class="fa-solid fa-circle-check"></i>
+        <span>تم نسخ رمز الغرفة بنجاح!</span>
+    </div>
+
     <!-- Main Content -->
-    <main class="max-w-4xl mx-auto px-4 py-8 w-full flex-grow flex items-center justify-center">
+    <main class="max-w-4xl mx-auto px-4 py-4 sm:py-6 w-full flex-grow flex items-start justify-center">
 
         <!-- ROLE SELECTOR -->
-        <section id="screenRoleSelector" class="w-full max-w-md space-y-4">
+        <section id="screenRoleSelector" class="w-full max-w-md space-y-4 my-auto">
             <div class="text-center space-y-2 mb-6">
                 <h2 class="text-2xl font-black text-white">مرحباً بك في المنصة</h2>
                 <p class="text-xs text-slate-400">اختر نوع الحساب للدخول</p>
@@ -98,7 +102,7 @@
         </section>
 
         <!-- STUDENT JOIN SCREEN -->
-        <section id="screenStudentJoin" class="hidden w-full max-w-md">
+        <section id="screenStudentJoin" class="hidden w-full max-w-md my-auto">
             <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-6 glow-emerald">
                 <div class="text-center space-y-2">
                     <h2 class="text-2xl font-black text-white">دخول المسابقة</h2>
@@ -122,7 +126,7 @@
         </section>
 
         <!-- STUDENT WAITING LOBBY -->
-        <section id="screenStudentWaiting" class="hidden w-full max-w-md text-center space-y-6">
+        <section id="screenStudentWaiting" class="hidden w-full max-w-md text-center space-y-6 my-auto">
             <div class="glass-panel p-8 rounded-3xl space-y-6 glow-emerald">
                 <div class="w-16 h-16 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-3xl mx-auto border border-emerald-500/40 animate-pulse">
                     <i class="fa-solid fa-hourglass-half"></i>
@@ -135,7 +139,7 @@
         </section>
 
         <!-- STUDENT QUIZ ACTIVE -->
-        <section id="screenStudentQuiz" class="hidden w-full max-w-xl space-y-6">
+        <section id="screenStudentQuiz" class="hidden w-full max-w-xl space-y-6 my-auto">
             <div class="glass-panel p-6 rounded-2xl flex justify-between items-center border-b border-emerald-500/30">
                 <div>
                     <span class="text-xs text-emerald-400 font-bold">مسابقة حية قائمة</span>
@@ -153,7 +157,7 @@
         </section>
 
         <!-- STUDENT WAITING FOR FINAL RESULT -->
-        <section id="screenStudentResult" class="hidden w-full max-w-md text-center space-y-6">
+        <section id="screenStudentResult" class="hidden w-full max-w-md text-center space-y-6 my-auto">
             <div class="glass-panel p-8 rounded-3xl space-y-6 glow-emerald">
                 <div id="studentResultIcon" class="w-20 h-20 bg-emerald-500/20 text-emerald-400 rounded-full flex items-center justify-center text-4xl mx-auto border border-emerald-500/40 animate-pulse">
                     <i class="fa-solid fa-hourglass-half"></i>
@@ -173,7 +177,7 @@
         </section>
 
         <!-- TEACHER AUTH -->
-        <section id="screenTeacherAuth" class="hidden w-full max-w-md">
+        <section id="screenTeacherAuth" class="hidden w-full max-w-md my-auto">
             <div class="glass-panel p-8 rounded-3xl shadow-2xl space-y-6 glow-purple">
                 <div class="text-center space-y-2">
                     <h2 class="text-2xl font-black text-white">دخول المستر</h2>
@@ -197,13 +201,13 @@
         </section>
 
         <!-- TEACHER DASHBOARD -->
-        <section id="screenTeacherDashboard" class="hidden w-full space-y-6">
+        <section id="screenTeacherDashboard" class="hidden w-full space-y-4">
             <div class="flex justify-between items-center">
                 <div>
-                    <h2 class="text-2xl font-black text-white">إدارة غرف المسابقات</h2>
+                    <h2 class="text-xl sm:text-2xl font-black text-white">إدارة غرف المسابقات</h2>
                     <p class="text-xs text-slate-400">قم بإنشاء غرف وتعيين الأسئلة والإجابات الصحيحة</p>
                 </div>
-                <button onclick="openCreateRoomScreen()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white px-5 py-2.5 rounded-xl font-bold text-sm shadow-lg flex items-center gap-2">
+                <button onclick="openCreateRoomScreen()" class="bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 text-white px-4 py-2 sm:px-5 sm:py-2.5 rounded-xl font-bold text-xs sm:text-sm shadow-lg flex items-center gap-2">
                     <i class="fa-solid fa-plus"></i> إنشاء غرفة جديدة
                 </button>
             </div>
@@ -213,7 +217,7 @@
 
         <!-- CREATE ROOM & QUESTIONS -->
         <section id="screenCreateRoom" class="hidden w-full max-w-2xl">
-            <div class="glass-panel p-8 rounded-3xl space-y-6 glow-purple">
+            <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-6 glow-purple">
                 <div class="flex justify-between items-center border-b border-slate-800 pb-4">
                     <h3 class="text-xl font-black text-white">إنشاء غرفة أسئلة جديدة</h3>
                     <button onclick="showScreen('screenTeacherDashboard')" class="text-slate-400 hover:text-white"><i class="fa-solid fa-xmark"></i></button>
@@ -263,7 +267,12 @@
                 </div>
                 <div class="text-center bg-slate-900 px-4 py-2 rounded-xl border border-slate-800">
                     <span class="text-[10px] text-slate-400 block">رمز الغرفة</span>
-                    <span id="monitorPin" class="text-xl font-black text-purple-400 font-mono">000000</span>
+                    <div class="flex items-center gap-2 mt-0.5">
+                        <span id="monitorPin" onclick="copyRoomPin(this.innerText)" class="text-xl font-black text-purple-400 font-mono cursor-pointer hover:underline" title="اضغط لنسخ الرمز">000000</span>
+                        <button onclick="copyRoomPin(document.getElementById('monitorPin').innerText)" class="text-slate-400 hover:text-purple-300 text-xs p-1" title="نسخ رمز الغرفة">
+                            <i class="fa-regular fa-copy"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
@@ -431,6 +440,21 @@
             }
         };
 
+        window.copyRoomPin = function(pinText) {
+            if (!pinText) return;
+            navigator.clipboard.writeText(pinText.toString().trim()).then(() => {
+                const toast = document.getElementById('copyToast');
+                if (toast) {
+                    toast.classList.remove('opacity-0', 'pointer-events-none');
+                    setTimeout(() => {
+                        toast.classList.add('opacity-0', 'pointer-events-none');
+                    }, 2000);
+                }
+            }).catch(() => {
+                alert('تم نسخ الرمز: ' + pinText);
+            });
+        };
+
         window.showScreen = function(screenId) {
             if(screenId !== 'screenTeacherDashboard' && roomsUnsubscribe) {
                 off(ref(db, 'rooms'), 'value', roomsUnsubscribe);
@@ -467,14 +491,9 @@
                 }
                 showScreen('screenStudentJoin');
             } else {
-                const savedTeacher = localStorage.getItem('ashour_teacher');
-                if (savedTeacher) {
-                    setupUserBadge(savedTeacher, 'المستر', 'teacher.png', true);
-                    listenToRooms();
-                    showScreen('screenTeacherDashboard');
-                } else {
-                    showScreen('screenTeacherAuth');
-                }
+                setupUserBadge('مستر محمد عاشور', 'المستر', 'teacher.png', true);
+                listenToRooms();
+                showScreen('screenTeacherDashboard');
             }
         };
 
@@ -656,7 +675,7 @@
             }
 
             localStorage.setItem('ashour_teacher', email);
-            setupUserBadge(email, 'المستر', 'teacher.png', true);
+            setupUserBadge('مستر محمد عاشور', 'المستر', 'teacher.png', true);
             listenToRooms();
             showScreen('screenTeacherDashboard');
         };
@@ -827,7 +846,14 @@
                                 <span class="text-[10px] bg-purple-500/20 text-purple-300 font-bold px-2.5 py-1 rounded-md">${room.questions ? room.questions.length : 0} أسئلة</span>
                                 ${room.isFinished ? '<span class="text-[10px] bg-red-500/20 text-red-400 font-bold px-2 py-1 rounded-md mr-1">منتهية</span>' : ''}
                                 <h3 class="text-lg font-bold text-white mt-2">${room.title}</h3>
-                                <p class="text-xs text-slate-400 mt-1">رمز PIN: <span class="text-purple-400 font-mono font-bold">${room.pin}</span></p>
+                                <div class="flex items-center gap-2 mt-1">
+                                    <p class="text-xs text-slate-400">رمز PIN: 
+                                        <span onclick="copyRoomPin('${room.pin}')" class="text-purple-400 font-mono font-bold cursor-pointer hover:underline" title="اضغط لنسخ الرمز">${room.pin}</span>
+                                    </p>
+                                    <button onclick="copyRoomPin('${room.pin}')" class="text-slate-500 hover:text-purple-400 text-xs p-1" title="نسخ رمز الغرفة">
+                                        <i class="fa-regular fa-copy"></i>
+                                    </button>
+                                </div>
                             </div>
                             <button onclick="deleteRoom(${room.pin})" class="text-slate-500 hover:text-red-400 p-2 transition" title="حذف الغرفة">
                                 <i class="fa-solid fa-trash-can"></i>
